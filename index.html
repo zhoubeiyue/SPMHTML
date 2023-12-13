@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parameter Configuration - Device Management Interface</title>
+    <style>
+        /* Define color variables for consistency */
+        :root {
+            --primary-color: #4CAF50;
+            --background-color: #ffffff;
+            --text-color: rgb(0, 0, 0);
+            --border-color: #000000;
+        }
+        .banner {
+            text-align: center;
+            padding: 20px 0; /* Add some padding for spacing */
+        }
+
+        .banner h1 {
+            font-size: 36px; /* Adjust the font size to make it larger */
+            margin: 0; /* Remove any default margin */
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            font-family: "Helvetica Neue", Arial, sans-serif;
+            font-size: 16px;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .main-container {
+            display: flex;
+            justify-content: space-between; /* 对齐左右两侧 */
+            align-items: start; /* 顶部对齐 */
+            width: 70%;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background-color: var(--background-color);
+        }
+
+        .header {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .menu {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .menu-item {
+            cursor: pointer;
+            font-size: 18px;
+            margin-bottom: 10px;
+            text-decoration: none;
+            background-color: var(--background-color);
+            border: 2px solid var(--primary-color);
+            border-radius: 5px;
+            padding: 15px;
+            color: var(--text-color);
+            text-align: center;
+            width: 30%;
+            transition: background-color 0.3s, color 0.3s, box-shadow 0.3s;
+        }
+
+        .menu-item:hover {
+            background-color: var(--primary-color);
+            color: black;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .description-container {
+            width: 50%; /* 占据右侧的一半宽度 */
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            max-height: 600px;
+            overflow: auto; 
+            background-color: var(--background-color);
+        }
+
+        /* 设置参数的样式 */
+        .parameter {
+            margin-bottom: 15px; /* 设置参数之间的底部间距 */
+        }
+
+        /* 设置参数标签的样式 */
+        .parameter-label {
+            font-size: 25px; /* 增大字体大小 */
+            font-weight: bold; /* 设置参数标签的字体粗细 */
+            font-family: Arial, sans-serif; /* 使用 Arial 字体以获得圆润的外观 */
+            border-radius: 5px; /* 添加圆角边框 */
+            padding: 5px 10px; /* 添加内边距以增加文本的空间感 */
+            margin-right: 10px; /* 设置参数标签与参数值之间的右侧间距 */
+            color: rgb(27, 27, 27); /* 设置参数标签的颜色 */
+        }
+
+        /* 设置参数值的样式 */
+            .parameter-value {
+            font-size: 25px; /* 设置参数值的字体大小 */
+            font-weight: bold; /* 设置参数标签的字体粗细 */
+            font-family: Arial, sans-serif; /* 使用 Arial 字体以获得圆润的外观 */
+            border-radius: 5px; /* 添加圆角边框 */
+            padding: 5px 10px; /* 添加内边距以增加文本的空间感 */
+            color: #4CAF50; /* 设置参数值的颜色 */
+        }
+
+        .config-container {
+            width: 50%; /* 占据右侧的一半宽度 */
+            padding: 10px;
+            /* Remove border */
+            border-radius: 5px;
+            margin: 10px 0;
+            max-height: 600px;
+            overflow: auto; 
+            background-color: var(--background-color);
+        }
+
+        #messageDisplay {
+            position: fixed; /* 固定位置 */
+            top: 20px; /* 距离顶部20像素 */
+            right: 20px; /* 距离右侧20像素 */
+            z-index: 1000; /* 高层级以确保可见 */
+            background-color: #4CAF50; /* 一个明显的背景颜色 */
+            color: white; /* 文字颜色 */
+            padding: 10px; /* 内边距 */
+            border-radius: 5px; /* 边框圆角 */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.5); /* 阴影效果 */
+            display: none; /* 默认不显示 */
+        }
+
+        .config-section {
+            border: none;
+            width: 30%;
+            margin: 10px 0 20px 0;
+            padding: 20px;
+            box-sizing: border-box;
+            background-color: var(--background-color);
+        }
+
+        .config-section label {
+            display: block;
+            margin-bottom: 10px;
+        }
+        /* 自定义复选框的容器 */
+        .checkbox-container {
+            display: block;
+            position: relative;
+            padding-left: 35px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            font-size: 18px;
+            user-select: none;
+        }
+
+        /* 隐藏原始复选框 */
+        .checkbox-container input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+
+        /* 创建一个自定义的复选框 */
+        .checkmark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 25px;
+            width: 25px;
+            background-color: #eee;
+            border-radius: 4px;
+        }
+
+        /* 当复选框被选中时，改变自定义复选框的颜色 */
+        .checkbox-container input:checked ~ .checkmark {
+            background-color: #2196F3;
+        }
+
+        /* 创建复选框内的勾选标记 */
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+
+        /* 显示勾选标记当复选框被选中 */
+        .checkbox-container input:checked ~ .checkmark:after {
+            display: block;
+        }
+
+        /* 自定义勾选标记的样式 */
+        .checkbox-container .checkmark:after {
+            left: 9px;
+            top: 5px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 3px 3px 0;
+            transform: rotate(45deg);
+        }
+
+        #pem-form {
+            font-size: 20px; /* 增大整个表单的字体大小 */
+        }
+
+        .file-input-container input[type="file"] {
+            font-size: 20px; /* 单独为文件输入元素设置字体大小 */
+        }
+
+        #pem-form input[type="button"] {
+            font-size: 20px; /* 为按钮设置字体大小 */
+        }
+
+        .config-section input[type="text"],
+        .config-section input[type="number"],
+        .config-section input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid var(--border-color);
+            background-color: white;
+        }
+
+        .config-section button {
+            padding: 10px 30px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .config-section button:hover {
+            background-color: #5ef032; /* Slightly darker shade on hover */
+        }
+
+        .footer {
+            text-align: center;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+            padding: 20px 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="banner">
+        <h1>BITUO-TECHNIK</h1>
+    </div>
+
+    <div class="main-container">
+        <div class="description-container">
+            <div class="header">Available parameters</div>
+            <div class="parameter">
+                <span class="parameter-label">Post:</span>
+                <span class="parameter-value" id="post-value"></span>
+            </div>
+            <div class="parameter">
+                <span class="parameter-label">Time:</span>
+                <span class="parameter-value" id="time-value"></span>
+            </div>
+            <div class="parameter">
+                <span class="parameter-label">Device Type:</span>
+                <span class="parameter-value" id="devicetype-value"></span>
+            </div>
+            <div class="parameter">
+                <span class="parameter-label">Product Model:</span>
+                <span class="parameter-value" id="productModel-value"></span>
+            </div>
+            <div class="parameter">
+                <span class="parameter-label">FW Version:</span>
+                <span class="parameter-value" id="FWVersion-value"></span>
+            </div>
+            <div class="parameter">
+                <span class="parameter-label">Serialnubmer:</span>
+                <span class="parameter-value" id="Serialnubmer-value"></span>
+            </div>
+            <div class="parameter">
+                <span class="parameter-label">RSSI(dB):</span>
+                <span class="parameter-value" id="RSSI-value"></span>
+            </div>
+            <div class="parameter">
+                <span class="parameter-label">Voltage(V):</span>
+                <span class="parameter-value" id="Voltage-value"></span>
+            </div>
+            <div class="parameter">
+                <span class="parameter-label">Current(A):</span>
+                <span class="parameter-value" id="current-value"></span>
+            </div>
+            <div class="parameter">
+                <span class="parameter-label">Active Power(KW):</span>
+                <span class="parameter-value" id="ActivePower-value"></span>
+            </div>
+            <div class="parameter">
+                <span class="parameter-label">Power Factor:</span>
+                <span class="parameter-value" id="PowerFactor-value"></span>
+            </div>
+            <div class="parameter">
+                <span class="parameter-label">Frequency(Hz):</span>
+                <span class="parameter-value" id="Frequency-value"></span>
+            </div>
+            <div class="parameter">
+                <span class="parameter-label">Forward Energy(KWh):</span>
+                <span class="parameter-value" id="ForwardEnergy-value"></span>
+            </div>
+            <div class="parameter">
+                <span class="parameter-label">Reverse Energy(KWh):</span>
+                <span class="parameter-value" id="ReverseEnergy-value"></span>
+            </div>
+            <div class="parameter">
+                <span class="parameter-label">Alarm:</span>
+                <span class="parameter-value" id="Alarm-value"></span>
+            </div>
+        </div>
+        
+        <div class="config-container">
+            <div class="header">Parameter Configuration</div>
+            <div class="content">
+                <!-- WiFi Configuration Section -->
+                <div class="menu-item" onclick="showConfig('wifi')">WiFi</div>
+                <div id="wifi" class="config-section" style="display:none;">
+                    <h2>WiFi Configuration</h2>
+                    <label>Username: <input type="text" id="wifi-username"></label>
+                    <label>Password: <input type="password" id="wifi-password"></label>
+                    <button class="save-button" onclick="sendData('wifi')">Save WiFi</button>
+                </div>
+
+                <!-- AP Configuration Section -->
+                <div class="menu-item" onclick="showConfig('ap')">AP</div>
+                <div id="ap" class="config-section" style="display:none;">
+                    <h2>AP Configuration</h2>
+                    <label>AP Username: <input type="text" id="ap-username"></label>
+                    <label>AP Password: <input type="password" id="ap-password"></label>
+                    <button class="save-button" onclick="sendData('ap')">Save AP</button>
+                </div>
+
+                <!-- MQTT Configuration Section -->
+                <div class="menu-item" onclick="showConfig('mqtt')">MQTT</div>
+                <div id="mqtt" class="config-section" style="display:none;">
+                    <h2>MQTT Configuration</h2>
+                    <label class="checkbox-container">SSL/TLS
+                        <input type="checkbox" id="mqtt-ssl-tls">
+                        <span class="checkmark"></span>
+                    </label>
+                    <label>Host: <input type="text" id="mqtt-host"></label>
+                    <label>Port: <input type="number" id="mqtt-port"></label>
+                    <label>Client ID: <input type="text" id="mqtt-clientid"></label>
+                    <label>Username: <input type="text" id="mqtt-username"></label>
+                    <label>Password: <input type="password" id="mqtt-password"></label>
+                    <button class="save-button" onclick="sendData('mqtt')">Save MQTT</button>
+                    <!-- PEM File Upload Section -->
+                    <h2>Upload CA File</h2>
+                    <form id="pem-form" enctype="multipart/form-data">
+                        <div class="file-input-container">
+                            <input type="file" name="file" accept=".pem">
+                        </div>
+                        <input type="button" value="Upload" onclick="uploadPem()">
+                    </form>
+                </div>
+
+                <!-- TOPIC Section -->
+                <div class="menu-item" onclick="showConfig('topic')">TOPIC</div>
+                <div id="topic" class="config-section" style="display:none;">
+                    <h2>TOPIC Configuration</h2>
+                    <label>topic_post: <input type="text" id="topic_post"></label>
+                    <label>topic_set: <input type="text" id="topic_set"></label>
+                    <label>topic_response: <input type="text" id="topic_response"></label>
+                    <label>topic_metadata: <input type="text" id="topic_metadata"></label>
+                    <button class="save-button" onclick="sendData('topic')">Save TOPIC</button>
+                </div>
+
+                <!-- WiFi Configuration Section -->
+                <div class="menu-item" onclick="showConfig('clear')">CLEAR</div>
+                <div id="clear" class="config-section" style="display:none;">
+                    <h2>Clear Energy</h2>
+                    <label class="checkbox-container">Confirm Clear
+                        <input type="checkbox" id="ConfirmClear" onchange="updateCheckboxValue()">
+                        <span class="checkmark"></span>
+                    </label>
+                    <input type="hidden" id="ConfirmClearValue" name="ConfirmClearValue" value="false">
+                    <button class="save-button" onclick="sendData('clear')">Clear Energy</button>
+                </div>
+
+                <!-- WiFi Configuration Section -->
+                <div class="menu-item" onclick="showConfig('report')">REPORT</div>
+                <div id="report" class="config-section" style="display:none;">
+                    <h2>Report Frequency(s)</h2>
+                    <label>Report Frequency: <input type="number" id="ReportFrequency"></label>
+                    <button class="save-button" onclick="sendData('report')">Save Frequency</button>
+                </div>
+
+                <!-- WiFi Configuration Section -->
+                <div class="menu-item" onclick="showConfig('alarm')">ALARM</div>
+                <div id="alarm" class="config-section" style="display:none;">
+                    <h2>Alarm Configuration</h2>
+                    <label>OverLoad(KW): <input type="number" id="OverLoad"></label>
+                    <label>OverCurrent(A): <input type="number" id="OverCurrent"></label>
+                    <label>OverVlotage(V): <input type="number" id="OverVlotage"></label>
+                    <label>LowVlotage(V): <input type="number" id="LowVlotage"></label>
+                    <button class="save-button" onclick="sendData('alarm')">Save Alarm</button>
+                </div>
+
+                <!-- WiFi Configuration Section -->
+                <div class="menu-item" onclick="showConfig('ota')">OTA</div>
+                <div id="ota" class="config-section" style="display:none;">
+                    <h2>OTA Configuration</h2>
+                    <label>Url: <input type="text" id="Url"></label>
+                    <button class="save-button" onclick="sendData('ota')">Start OTA</button>
+                </div>
+
+                <!-- WiFi Configuration Section -->
+                <div class="menu-item" onclick="showConfig('restart')">RESTART</div>
+                <div id="restart" class="config-section" style="display:none;">
+                    <h2>Esp Restart</h2>
+                    <label class="checkbox-container">Esp Restart
+                        <input type="checkbox" id="ConfirmRestart" onchange="updateCheckboxValue1()">
+                        <span class="checkmark"></span>
+                    </label>
+                    <input type="hidden" id="EspRestart" name="EspRestart" value="false">
+                    <button class="save-button" onclick="sendData('restart')">Esp Restart</button>
+                </div>
+            </div>
+        </div>
+        <!-- Message Display -->
+        <div id="messageDisplay" style="display: none;"></div>
+    </div>
+    <div class="main1-container">
+        <div class="footer">
+            <p>Version: 0.0.1</p>
+        </div>
+    </div>
+<script>
+    function showConfig(configType) {
+        document.querySelectorAll('.config-section').forEach(function(section) {
+            section.style.display = 'none';
+        });
+        document.getElementById(configType).style.display = 'block';
+    }
+        
+    function updateCheckboxValue() {
+        var checkbox = document.getElementById('ConfirmClear');
+        var hiddenInput = document.getElementById('ConfirmClearValue');
+        hiddenInput.value = checkbox.checked ? "true" : "false";
+    }
+        
+    function updateCheckboxValue1() {
+        var checkbox = document.getElementById('ConfirmRestart');
+        var hiddenInput = document.getElementById('EspRestart');
+        hiddenInput.value = checkbox.checked ? "true" : "false";
+    }
+        
+    function sendData(configType) {
+        let data = {};
+        
+        if (configType === 'wifi') {
+            data = {
+                username: document.getElementById('wifi-username').value,
+                password: document.getElementById('wifi-password').value
+            };
+        } else if (configType === 'ap') {
+            data = {
+                username: document.getElementById('ap-username').value,
+                password: document.getElementById('ap-password').value
+            };
+        } else if (configType === 'mqtt') {
+            data = {
+                ssltls: document.getElementById('mqtt-ssl-tls').checked,
+                host: document.getElementById('mqtt-host').value,
+                port: document.getElementById('mqtt-port').value,
+                clientid: document.getElementById('mqtt-clientid').value,
+                username: document.getElementById('mqtt-username').value,
+                password: document.getElementById('mqtt-password').value
+                };
+        } else if (configType === 'topic') {
+            data = {
+                topic_post: document.getElementById('topic_post').value,
+                topic_set: document.getElementById('topic_set').value,
+                topic_response: document.getElementById('topic_response').value,
+                topic_metadata: document.getElementById('topic_metadata').value
+            };
+        } else if (configType === 'clear') {
+            data = {
+                ConfirmClearValue: document.getElementById('ConfirmClearValue').value
+            };
+        } else if (configType === 'restart') {
+            data = {
+                EspRestart: document.getElementById('EspRestart').value
+            };
+        } else if (configType === 'report') {
+            data = {
+                ReportFrequency: document.getElementById('ReportFrequency').value
+            };
+        } else if (configType === 'alarm') {
+            data = {
+                OverLoad: document.getElementById('OverLoad').value,
+                OverCurrent: document.getElementById('OverCurrent').value,
+                OverVlotage: document.getElementById('OverVlotage').value,
+                LowVlotage: document.getElementById('LowVlotage').value
+            };
+        } else if (configType === 'ota') {
+            data = {
+                Url: document.getElementById('Url').value,
+            };
+        }
+        
+        fetch('/save-config', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ configType, ...data })
+        })
+        .then(response => response.text())
+        .then(data => showMessage(data))
+            .catch(error => console.error('Error:', error));
+    }
+        
+    function showMessage(message) {
+        var messageDisplay = document.getElementById('messageDisplay');
+        messageDisplay.textContent = message;
+        messageDisplay.style.display = 'block';
+        
+        setTimeout(() => {
+            messageDisplay.style.display = 'none';
+        }, 3000);
+    }
+        
+    function uploadPem() {
+        var formData = new FormData(document.getElementById('pem-form'));
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '/upload', true);
+        
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                var responseText = xhr.responseText;
+                showMessage(responseText); // 使用现有的showMessage函数显示响应
+            } else {
+                showMessage('Upload failed!'); // 显示失败消息
+            }
+        };
+        
+            xhr.send(formData);
+    }
+        
+    function fetchData() {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                var data = JSON.parse(this.responseText);
+                
+                // Update the web page with the received data
+                document.getElementById("post-value").innerHTML = data.post;
+                document.getElementById("time-value").innerHTML = data.time;
+                document.getElementById("productModel-value").innerHTML = data.productModel;
+                document.getElementById("FWVersion-value").innerHTML = data.FWVersion;
+                document.getElementById("Serialnubmer-value").innerHTML = data.Serialnubmer;
+                document.getElementById("RSSI-value").innerHTML = data.rssi;
+                document.getElementById("devicetype-value").innerHTML = data.devicetype;
+                document.getElementById("current-value").innerHTML = data.current;
+                document.getElementById("Voltage-value").innerHTML = data.voltage;
+                document.getElementById("ActivePower-value").innerHTML = data.activepower;
+                document.getElementById("PowerFactor-value").innerHTML = data.powerfactor;
+                document.getElementById("Frequency-value").innerHTML = data.frequency;
+                document.getElementById("ForwardEnergy-value").innerHTML = data.forwardenergy;
+                document.getElementById("ReverseEnergy-value").innerHTML = data.reverseenergy;
+                document.getElementById("Alarm-value").innerHTML = data.alarm;
+            }
+        };
+        xhttp.open("GET", "/data", true);
+        xhttp.send();
+    }
+          
+    // Fetch data every 10 seconds
+    setInterval(fetchData, 5000);
+</script>
+</body>
+</html>
